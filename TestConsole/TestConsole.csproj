@@ -6,11 +6,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DataAccessLayerDB\DataAccessLayerDB.csproj" />
+    <ProjectReference Include="..\DataAccessLayerIO\DataAccessLayerIO.csproj" />
     <ProjectReference Include="..\DomainLayer\DomainLayer.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="forests\" />
+    <Folder Include="Logs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

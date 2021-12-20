@@ -1,65 +1,99 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using DomainLayer.Exceptions.Models;
 using System.Drawing;
+using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 
 namespace DomainLayer.Models
 {
     public class Forest
     {
-        public int MinX { get; set; }
-        public int MinY { get; set; }
-        public int MaxX { get; set; }
-        public int MaxY { get; set; }
+        public int Id { get;private set; }
+        public int Width { get; private set; }
+        public int Height { get; private set; }
+        public int Scale { get; private set; }
+        private List<Monkey> _monkeys;
+        private List<Tree> _trees;
 
-        public int Scale { get; set; }
-        public List<Monkey> Monkeys { get; set; }
-        public List<Tree> Trees { get; set; }
-
-
-        public void SetMinX(int minX)
+        public Forest(int id, int width, int height, int scale, List<Monkey> monkeys, List<Tree> trees)
         {
-            if (minX < 0) throw new ForestException(nameof(SetMinX)+" - De minimum waarde kan niet kleiner zijn 0");
-            if (minX > MaxX) throw new ForestException(nameof(SetMinX) + " - De minimum waarde kan niet groter zijn de maximum waarde");
-            MinX = minX;
-        }
-        public void SetMinY(int minY)
-        {
-            if (minY < 0) throw new ForestException(nameof(SetMinY) + " - De minimum waarde kan niet kleiner zijn 0");
-            if (minY > MaxY) throw new ForestException(nameof(SetMinY) + " - De minimum waarde kan niet groter zijn dan de  maximum waarde");
-            MinY = minY;
+            SetHeight(height);
+            SetWidth(width);
+            SetScale(scale);
+            SetId(id);
+            SetMonkeys(monkeys);
+            SetTrees(trees);
         }
 
-        public void SetMaxX(int maxX)
+        public void SetId(int id)
         {
-            if (maxX < 0) throw new ForestException(nameof(SetMaxX) + " - De maximum waarde kan niet kleiner zijn 0");
-            if (maxX < MinX) throw new ForestException(nameof(SetMaxX) + " - De maximum waarde kan niet kleiner zijn dan de mimimum waarde");
-            MaxX = maxX;
+            if (id < 1) throw new ForestException(nameof(SetId) + " - Id is kleiner dan 1");
+            Id = id;
         }
 
-        public void SetMaxY(int maxY)
+        public void SetWidth(int width)
         {
-            if (maxY < 0) throw new ForestException(nameof(SetMaxY) + " - De maximum waarde kan niet kleiner zijn 0");
-            if (maxY < MinY) throw new ForestException(nameof(SetMaxY) + " - De maximum waarde kan niet kleiner zijn dan de mimimum waarde");
-            MaxY = maxY;
+            if (width < 0) throw new ForestException(nameof(SetWidth)+" - De minimum waarde kan niet kleiner zijn 0");
+            Width = width;
         }
+        public void SetHeight(int height)
+        {
+            if (height < 0) throw new ForestException(nameof(SetHeight) + " - De minimum waarde kan niet kleiner zijn 0");
+            Height = height;
+        }
+
+        public void SetScale(int scale)
+        {
+            if (scale < 0) throw new ForestException(nameof(SetScale) + " - De minimum waarde kan niet kleiner zijn 0");
+            Scale = scale;
+        }
+
+        public void SetTrees(List<Tree> trees)
+        {
+            if (trees == null || trees.Count < 1) throw new ForestException(nameof(SetTrees) + " - Bevat geen trees");
+            _trees = trees;
+        }
+
+        public IReadOnlyList<Tree> GetTrees()
+        {
+            return _trees;
+        }
+
+        public void SetMonkeys(List<Monkey> monkeys)
+        {
+            if (monkeys == null || monkeys.Count < 1) throw new ForestException(nameof(SetMonkeys) + " - Bevat geen monkeys");
+            _monkeys = monkeys;
+        }
+
+        public IReadOnlyList<Monkey> GetMonkeys()
+        {
+            return _monkeys;
+        }
+
 
         public Bitmap Draw()
         {
-            var bm = new Bitmap((Scale*MinX), (Scale*MinY));
+            var bm = new Bitmap((Scale*Width), (Scale*Height));
             using var graphics = Graphics.FromImage(bm);
-            graphics.Clear(Color.White);
-            foreach (var tree in Trees)
+            graphics.Clear(Color.Black);
+            foreach (var tree in _trees)
             {
-                using var thickPen = new Pen(Color.Blue, 2*Scale);
-                graphics.DrawEllipse(thickPen, new Rectangle(tree.Point, new Size(7*Scale, 7*Scale)));
+                using var thickPen = new Pen(Color.Blue, 2 * Scale);
+                var centerPoint = new Point(tree.Point.X - 5 * Scale, tree.Point.Y - 5 * Scale);
+                graphics.DrawEllipse(thickPen, new Rectangle( centerPoint,new Size(5*2*Scale,5*2*Scale)));
             }
-            foreach (var monkey in Monkeys)
+            foreach (var monkey in _monkeys)
             {
+                using var thickPen = new Pen(monkey.Color, 2 * Scale);
+                if (monkey.GetUsedTrees().Count > 1)
+                {
+                    graphics.DrawLines(thickPen, monkey.GetUsedTrees().Select(tr=>tr.Point).ToArray());
+                }
                 using var brush = new SolidBrush(monkey.Color);
-                graphics.FillEllipse(brush, new Rectangle(monkey.Point, new Size(7*Scale, 7*Scale)));
+                var centerPoint = new Point(monkey.StartTree.Point.X - 5 * Scale, monkey.StartTree.Point.Y - 5 * Scale);
+                graphics.FillEllipse(brush, new Rectangle(centerPoint, new Size(5 * 2 * Scale, 5* 2 * Scale)));
             }
-
             return bm;
         }
 

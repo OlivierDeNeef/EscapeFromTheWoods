@@ -14,11 +14,11 @@ namespace DomainLayer.Managers
             for (var i = 0; i < amount; i++)
             {
                 var id = Guid.NewGuid();
-                var point = new Point(rnd.Next(offset/10, (maxX-offset)/10)*scale*10, rnd.Next(offset/10, (maxY-offset)/10)*scale*10);
-                listOfTrees.Add(new Tree(){Id = id,Point = point});
-                
+                var randomX = rnd.Next( offset / 10, (maxX - offset) / 10) * scale * 10;
+                var randomY = rnd.Next(offset / 10, (maxY - offset) / 10) * scale * 10;
+                var point = new Point(randomX, randomY);
+                listOfTrees.Add(new Tree(i+1,point));
             }
-
             return listOfTrees;
         }
     }
