@@ -61,7 +61,7 @@ namespace DomainLayer.Models
             {
                 var closestTree= currenTree.ShortestPoint(unusedTrees, forest);
                 if (closestTree == null) return;
-                await repo.AddLog(forest, this, closestTree);
+                await repo.AddLogAsync(forest, this, closestTree);
                 currenTree = closestTree;
                 unusedTrees.Remove(currenTree);
                 _usedTrees.Add(currenTree);

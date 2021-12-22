@@ -8,6 +8,6 @@ namespace DomainLayer.Interfaces
     {
         Task AddWoodRecordsAsync(Forest forest);
         Task AddMonkeyRecordsAsync(Forest forest,List<Monkey> monkeys);
-        Task AddLog(Forest forest, Monkey monkey, Tree tree);
+        Task AddLogAsync(Forest forest, Monkey monkey, Tree tree);
     }
 }

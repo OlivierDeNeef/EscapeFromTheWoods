@@ -23,22 +23,20 @@ namespace DataAccessLayerDB
 
         public async Task AddWoodRecordsAsync(Forest forest)
         {
-            var records =  RecordMapper.ToWoodRecord(forest);
-            await _recordsDataContext.WoodRecords.AddRangeAsync(records);
+            await _recordsDataContext.WoodRecords.AddRangeAsync(RecordMapper.ToWoodRecord(forest));
             await SaveAndClear();
         }
         public async Task AddMonkeyRecordsAsync(Forest forest,List<Monkey> monkeys)
         {
             foreach (var monkey in monkeys)
             {
-                var records = RecordMapper.ToMonkeyRecords(forest,monkey);
-                await _recordsDataContext.MonkeyRecords.AddRangeAsync(records);
+                await _recordsDataContext.MonkeyRecords.AddRangeAsync(RecordMapper.ToMonkeyRecords(forest, monkey));
             }
             
             await SaveAndClear();
         }
 
-        public async Task AddLog(Forest forest, Monkey monkey, Tree tree)
+        public async Task AddLogAsync(Forest forest, Monkey monkey, Tree tree)
         {
             await _recordsDataContext.AddAsync(RecordMapper.ToLog(forest, monkey, tree));
             await SaveAndClear();
