@@ -29,42 +29,31 @@ namespace TestConsole
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-
-            //DB
-            IRecordRepo repo = new RecordRepo(new RecordsDataContext(configuration));
-            //IO
-            IFileProcessor fileProcessor = new FileProcessor(configuration);
+            Console.WriteLine("Forest calculating... \n");
 
             var treeManager = new TreeManager();
-            var monkeys = new List<Monkey>();
+         
+            var forests = new List<Forest>();
 
-            var trees = treeManager.GenerateTrees(500, 500, 400, 10, 15);
-
-            monkeys.Add(new Monkey(1, "Tom", trees[monkeys.Count], Color.Green));
-            monkeys.Add(new Monkey(2, "Jerry", trees[monkeys.Count], Color.Yellow));
-            monkeys.Add(new Monkey(3, "Ben", trees[monkeys.Count], Color.Red));
-            monkeys.Add(new Monkey(4, "Jens", trees[monkeys.Count], Color.DarkSlateGray));
-
-            var forest = new Forest(1, 500, 500, 15, monkeys, trees);
-
-            var tasks = monkeys.Select(m => m.StartJumpingAsync(forest, new RecordRepo(new RecordsDataContext(configuration)))).ToList();
-            tasks.Add(repo.AddWoodRecordsAsync(forest));
-            await Task.WhenAll(tasks);
-
-            var LoggingTask = new List<Task>()
-            {
-                fileProcessor.LogMonkeysAsync(monkeys),
-                repo.AddMonkeyRecordsAsync(forest, monkeys)
-            };
+            for (int i = 1; i <= 10; i++)
+            {   
+                var monkeys = new List<Monkey>();
+                var trees = treeManager.GenerateTrees(500, 500, 500, 10, 15);
+                monkeys.Add(new Monkey(1, "Tom", trees[monkeys.Count], Color.Green));
+                monkeys.Add(new Monkey(2, "Jerry", trees[monkeys.Count], Color.Yellow));
+                monkeys.Add(new Monkey(3, "Ben", trees[monkeys.Count], Color.Red));
+                monkeys.Add(new Monkey(4, "Jens", trees[monkeys.Count], Color.DarkSlateGray));
+                forests.Add(new Forest(i, 500, 500, 15, monkeys, trees));
+            }
 
 
-            //Save JPG
-            fileProcessor.SaveBitmap(forest.Draw());
+            
+            var games = forests.Select(f=> EscapeFromTheWoods.StartGame(f, configuration)).ToList();
 
-            await Task.WhenAll(LoggingTask);
+            await Task.WhenAll(games);
 
             stopwatch.Stop();
-            Console.WriteLine(stopwatch.ElapsedMilliseconds);
+            Console.WriteLine(stopwatch.ElapsedMilliseconds +" ms");
         }
 
         
