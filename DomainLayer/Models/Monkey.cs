@@ -11,11 +11,22 @@ namespace DomainLayer.Models
 {
     public class Monkey
     {
+        #region Fields
+
+        private readonly List<Tree> _usedTrees;
+
+        #endregion
+
+        #region Properties
+
         public int Id { get;private set; }
         public string Name { get;private set; }
         public Tree StartTree { get;private set; }
         public Color Color { get; set; }
-        private readonly List<Tree> _usedTrees;
+
+        #endregion
+
+        #region Constructors
 
         public Monkey(int id, string name, Tree startTree, Color color)
         {
@@ -25,6 +36,10 @@ namespace DomainLayer.Models
             Color = color;
             _usedTrees = new List<Tree>();
         }
+
+        #endregion
+
+        #region Methodes
 
         public void SetId(int id)
         {
@@ -48,7 +63,6 @@ namespace DomainLayer.Models
             return _usedTrees;
         }
 
-
         public async Task StartJumpingAsync(Forest forest, IRecordRepo repo)
         {
             var unusedTrees = new List<Tree>(forest.GetTrees());
@@ -67,5 +81,7 @@ namespace DomainLayer.Models
                 _usedTrees.Add(currenTree);
             }
         }
+
+        #endregion
     }
 }

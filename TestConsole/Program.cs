@@ -5,13 +5,9 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using DataAccessLayerDB;
-using DataAccessLayerIO;
-using DomainLayer.Interfaces;
 using DomainLayer.Managers;
 using DomainLayer.Models;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace TestConsole
 {
@@ -32,10 +28,11 @@ namespace TestConsole
             Console.WriteLine("Forest calculating... \n");
 
             var treeManager = new TreeManager();
-         
             var forests = new List<Forest>();
+           
 
-            for (int i = 1; i <= 10; i++)
+            //Voegt i aantal keer een bos toe met random bomen en appen
+            for (int i = 1; i <= 20; i++)
             {   
                 var monkeys = new List<Monkey>();
                 var trees = treeManager.GenerateTrees(500, 500, 500, 10, 15);
@@ -46,10 +43,10 @@ namespace TestConsole
                 forests.Add(new Forest(i, 500, 500, 15, monkeys, trees));
             }
 
+            //Laat alle apen voor alle bossen ontsnappen. geeft een lijst van tasks terug.
+            var games = forests.Select(f=> EscapeFromTheWoods.StartGameAsync(f, configuration)).ToList();
 
-            
-            var games = forests.Select(f=> EscapeFromTheWoods.StartGame(f, configuration)).ToList();
-
+            //Wacht tot alle tasks van lijst gedaan zijn.
             await Task.WhenAll(games);
 
             stopwatch.Stop();

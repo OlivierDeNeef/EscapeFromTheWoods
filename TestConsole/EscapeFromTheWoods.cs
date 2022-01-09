@@ -13,29 +13,35 @@ namespace TestConsole
 {
     public static class EscapeFromTheWoods
     {
-        public static async Task StartGame( Forest forest , IConfiguration configuration)
+        public static async Task StartGameAsync( Forest forest , IConfiguration configuration)
         {
             IRecordRepo recordRepo = new RecordRepo(new RecordsDataContext(configuration));
             IFileProcessor fileProcessor = new FileProcessor(configuration);
-            var tasks = forest.GetMonkeys().Select(m => m.StartJumpingAsync(forest, new RecordRepo(new RecordsDataContext(configuration)))).ToList();
-            tasks.Add(recordRepo.AddWoodRecordsAsync(forest));
-            await Task.WhenAll(tasks);
 
-            var LoggingTask = new List<Task>()
+            // Laat alle apen die in het bos zitten ontsnappen en dit geeft een lijst terug van tasks.
+            var tasks = forest.GetMonkeys().Select(m => m.StartJumpingAsync(forest, new RecordRepo(new RecordsDataContext(configuration)))).ToList();
+
+            //Voegt een forest logging task toe aan de lijst
+            tasks.Add(recordRepo.AddWoodRecordsAsync(forest));
+
+            //Wacht tot alle tasks gedaan zijn.
+            await Task.WhenAll(tasks);
+            
+            //Voegt monkey file logging task toe en monkey db logging task toe.
+            var loggingTasks = new List<Task>()
             {
                 fileProcessor.LogMonkeysAsync(forest.GetMonkeys().ToList()),
                 recordRepo.AddMonkeyRecordsAsync(forest, forest.GetMonkeys().ToList())
             };
             //Save JPG
             fileProcessor.SaveBitmap(forest.Draw());
-            await Task.WhenAll(LoggingTask);
-            Thread thread = Thread.CurrentThread;
-            var msg = $"forest {forest.Id} thread information\n" +
-                            $"----Background: {thread.IsBackground}\n" +
-                            $"----Thread Pool: {thread.IsThreadPoolThread}\n" +
-                            $"----Thread ID: {thread.ManagedThreadId}\n";
+
+            //Wacht tot als de logging tasks gedaan zijn.
+            await Task.WhenAll(loggingTasks);
+
             
-            Console.WriteLine(msg);
+            Console.WriteLine($"forest {forest.Id} thread information\n" +
+                              $"----Thread ID: {Thread.CurrentThread.ManagedThreadId}\n");
         }
     }
 }

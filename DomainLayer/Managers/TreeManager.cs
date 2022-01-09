@@ -11,13 +11,13 @@ namespace DomainLayer.Managers
         {
             var rnd = new Random();
             var listOfTrees = new List<Tree>();
-            for (var i = 0; i < amount; i++)
+            for (var i = 1; i <= amount; i++)
             {
                 var id = Guid.NewGuid();
                 var randomX = rnd.Next( offset / 10, (maxX - offset) / 10) * scale * 10;
                 var randomY = rnd.Next(offset / 10, (maxY - offset) / 10) * scale * 10;
                 var point = new Point(randomX, randomY);
-                listOfTrees.Add(new Tree(i+1,point));
+                listOfTrees.Add(new Tree(i,point));
             }
             return listOfTrees;
         }
